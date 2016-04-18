@@ -1,0 +1,161 @@
+html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+a {
+    text-decoration: none;
+  }
+section {
+    width: 100%;
+    height: 90%;
+    background: black; 
+}
+#Title{
+    background-color:black; 
+    color:white; 
+    font-family:arial; 
+    text-align:center; 
+    font-size:large;
+    height: 6%;
+
+}
+
+.angular-google-map-container { 
+    
+    /*
+    height: 550px; 
+    width: 65%;
+    float: left;
+    */
+    height: 90%;
+    width: 65%;
+    position: absolute; 
+    /*top: 0;
+    left: 0;*/ 
+}
+
+/* get rid of? */
+#MapView{
+    height: 90%;
+    width: 100%;
+    float: left;
+}
+
+
+
+div#Test{
+    background:aqua;
+    height: 100px;
+    float:left;
+    width: 35%;
+    position: relative;
+    top: 5px;
+}
+
+#userQueries{
+    /*margin: 5px;*/
+    float: right;
+    width: 34%; 
+   /* overflow-x: scroll; */ 
+    /*position: relative;*/
+}
+
+#nodeSelection{
+    display:inline-block; /* instead of table-row*/ 
+    padding: 0px;
+    height: 200px;
+    width: 100%;
+    white-space: nowrap;
+}
+
+#labelWrapperSource {
+    display: inline-block; /* changed from table-row */
+    float: left;
+    color:white;
+    text-align: center;
+    padding: 0px 5px 0px 5px;
+   /* height: 200px;
+    width: 200px; 
+    overflow: scroll; */
+    overflow: scroll;
+    font-family: Book Antiqua;
+    left: 10px;
+    width: 50%;
+    background-color: black;
+}
+
+
+#labelWrapperDest{
+    display: inline-block; /* changed from table-row */
+    color:white;
+    text-align: center;
+    padding: 0px 5px 0px 5px;
+   /* height: 200px;
+    width: 200px; 
+    overflow: scroll; */
+    overflow: scroll;
+    font-family: Book Antiqua;
+    left: 10px;
+
+    background-color: black;
+}
+
+#divInCell{
+    /*height: 50%;*/
+    height: 200px;
+    width: 100%;
+    overflow: scroll;
+    outline-color: black;
+    outline-width: 2px;
+    background-color: gray;
+    border: 5px black;
+    text-align: left;
+}
+
+#markerNames{
+    display: block; 
+}
+
+#customQueries{
+    margin: 5px;
+    width: 90%;
+    padding: 5px;
+}
+
+#infoText {
+    font-style: italic;
+    font-size: small;
+}
+
+#showLink{
+    font-family: Book Antiqua; 
+    font-size:medium;
+    font-weight: bold; 
+    border-width: medium;
+    border-color: white;
+    border-style: solid;
+    width: 85%;
+    /*position: relative; */
+    top: 5px; 
+    bottom: 15px;
+    padding: 5px;
+    background-color: gray;
+    color: black;
+}
+
+#buttonHolder{
+    text-align: center;
+    padding: 10px 0px 5px 0px;
+
+}
+
+#databaseCtrl{
+    background-color:aqua;
+    height: 4%; 
+}
+
+
+#repeat{ 
+     display: inline;
+     }
