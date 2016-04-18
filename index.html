@@ -39,16 +39,16 @@
     			</ui-gmap-google-map>
 
     			<div id ="userQueries">
-    			<div ng-controller="queryCtrl">
+    			<div id="queryCtrl">
 	    			<div id ="nodeSelection"> 
 		    			<div id ="labelWrapperSource"> Source Nodes
 		    				<div style="padding:0 0 5px; font-size:small">select source nodes to show</div>
 		    				<div style="text-align: left">
-								<input type="checkbox" ng-model=$parent.selectedAllSrc 
+								<input type="checkbox" ng-model=selectedAllSrc 
 								ng-click="checkAll('selectedSrc', 'selectedAllSrc')">Select All:
 							</div>
 		    				<div id =divInCell>
-			    				<div id="testMarkers" ng-repeat="marker in $parent.allMarkers" style:"font-color:white">
+			    				<div id="testMarkers" ng-repeat="marker in allMarkers" style:"font-color:white">
 									<input type="checkbox" ng-model="marker.selectedSrc">{{marker.name}}
 								</div>
 							</div>
@@ -56,11 +56,11 @@
 						<div id ="labelWrapperDest"> Destination Nodes
 							<div style="padding:0 0 5px; font-size:small">select destination nodes to show</div>
 							<div style="text-align: left">
-								<input type="checkbox" ng-model=$parent.selectedAllDest 
+								<input type="checkbox" ng-model=selectedAllDest 
 								ng-click="checkAll('selectedDest', 'selectedAllDest')">Select All: 
 							</div>
 							<div id =divInCell>
-				    			<div id="testMarkers" ng-repeat="marker in $parent.allMarkers" style:"font-color:white">
+				    			<div id="testMarkers" ng-repeat="marker in allMarkers" style:"font-color:white">
 									<input type="checkbox" ng-model="marker.selectedDest">{{marker.name}}
 								</div>
 							</div>
@@ -76,7 +76,7 @@
 						</label>		
 					</div>
 					<div id=buttonHolder>
-						<button id=checkboxButton ng-click="$parent.mapQuery()" style:"display: block">
+						<button id=checkboxButton ng-click="mapQuery()" style:"display: block">
 						Go! -- Show the Nodes / Links selected </button>
 					</div>
 					<div id ="showLink" ng-model="clickedLinkHTML">(click on a link to see its information)
@@ -104,6 +104,6 @@
 		<script type="text/javascript" src="app/updateDatabase.controller.js"></script>
 		<script type="text/javascript" src="app/parseTopologies.service.js"></script>
 		<script type="text/javascript" src="app/createSubsetQuery.service.js"></script>
-		<script type="text/javascript" src="app/queryMap.controller.js"></script>
+		<!--<script type="text/javascript" src="app/queryMap.controller.js"></script>-->
 	</body>
 </html>
