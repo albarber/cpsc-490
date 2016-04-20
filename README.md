@@ -13,10 +13,46 @@ In app/updateDatabase.controller.js, edit the object ‘$scope.userConfig’.
 + ctrlUsername and ctrlPassword are the login information for OpenDayLight authorization
 
 #### Database Configuration
-You must have MySQL installed on your computer. app/node\_modules/mysql contains node-mysql, a Node driver for MySQL, which allows Node.js to interface with MySQL. See Design Documentation->The Database->Setting Up The Database for particulars on creating a database and tables. In app/server.js, edit the object ‘userConfig’. 
+You must have MySQL installed on your computer. app/node\_modules/mysql contains node-mysql, a Node driver for MySQL, which allows Node.js to interface with MySQL. See "Setting Up The Database" for particulars on creating a database and tables. In app/server.js, edit the object ‘userConfig’. 
 + dbUsername -- your MySQL username
 + dbPassword -- your MySQL password
 + database -- the name of the database your tables are in
+
+##### Setting Up the Database
+In order for this application to run, there must be a MySQL Database with:  
++ A table named _Nodes_  
++ A table named _Links_  
+
+The table data should follow this structure:   
+**Node**  
+Node\_ID (int 11)  
+Node_Name (varchar 100), primary key  
+location\_lat (float 10,3)  
+location\_lng (float 10,3)  
+type (varchar 100)  
+
+MySQL query to create the _Nodes_ Table: 
+```SQL
+CREATE TABLE IF NOT EXISTS Nodes (Node_id int, Node_name VARCHAR(100), location_lat FLOAT(10,3),location_lng FLOAT(10,3), type VARCHAR (100), PRIMARY KEY(Node_name))
+```
+
+**Link**  
+Link\_id (int 11), primary key  
+Source\_node (varchar 100), foreign key references Nodes(Node\_name)  
+Dest\_node (varchar 100), foreign key references Nodes(Node\_name)  
+Intensity (float 10, 6),
+src_lat (float 10, 3), 
+src_lng (float 10, 3),
+dest_lat (float 10, 3),
+dest_lng (float 10, 3)  
+
+MySQL query to create the _Links_ Table: 
+```SQL
+CREATE TABLE IF NOT EXISTS Links (Link_id int, source_node VARCHAR(100), dest_node VARCHAR(100), intensity FLOAT(10,6), src_lat FLOAT(10,3), src_lng FLOAT(10,3), dest_lat FLOAT(10,3), dest_lng FLOAT(10,3), PRIMARY KEY(Link_id), FOREIGN KEY(source_node) REFERENCES Nodes(Node_name), FOREIGN KEY(dest_node) REFERENCES Nodes(Node_name))
+```
+
+_Note_: the 4 latitude and longitude columns will be set only after topology information about the nodes has been read in. Placing geographic information in both the Nodes and Links tables allows both groups to be treated separately on the map more easily. 
+
 
 #### Running GUI
 1. Have Node.js installed on your computer
