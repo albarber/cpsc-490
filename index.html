@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="prototypeApp">
 	<head>
-	    <title>490 Map Prototype [Rename]</title>
+	    <title>CPSC 490 Map</title>
 	    <meta name="viewport" content="initial-scale=1.0">
 	    <meta charset="utf-8">
 	    <link rel="stylesheet" href="css/maps.css">
@@ -9,13 +9,14 @@
 	    <script src='/bower_components/lodash/lodash.js'></script>
 	    <!--  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js"></script> -->
 		<script src='/bower_components/angular/angular.min.js'></script> 
+		<!--<script src='/bower_components/angular-route/angular-route.min.js'></script> -->
 		<script src='/bower_components/angular-simple-logger/dist/angular-simple-logger.min.js'></script>
 		<script src='/bower_components/angular-google-maps/dist/angular-google-maps.min.js'></script>
 	    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJNG9PULmfEJJLRjI-PMEth8FRgaE5PjU"></script>
 	    <script src="/markerCluster/markerclusterer.js" type="text/javascript"></script>
 	</head>
 	<body>
-		<div id=Title>[Insert App Name Here]</div>
+		<div id=Title>Ptolemy: An OpenDaylight Map</div>
 		<section>
 	  	<div id="MapView" ng-controller="MapCtrl">
  				<ui-gmap-google-map center='map.center' zoom='map.zoom' control='map.control' options='map.options'>
@@ -25,30 +26,24 @@
                 			<div ng-non-bindable>{{title}}</div>
             			</ui-gmap-windows>
             		</ui-gmap-markers>
-            		<!--<ui-gmap-polylines models="linkPaths" path="'path'" stroke="'stroke'" visible="'visible'"
-            		geodesic="'geodesic'" fit="false" clickable="true" static="true" events="'events'"></ui-gmap-polylines> -->
 
             		<!-- known error in ui-gmap-polylines: can't toggle visibility/edit; does not effect ui-gmap-polyline with ng-repeat -->
             		<ui-gmap-polyline ng-repeat="p in linkPaths" path="p.path" stroke="p.stroke" visible='p.visible'
             		geodesic="p.geodesic" fit="false" clickable="true" static="true" events="p.events"></ui-gmap-polyline>
 
-
-            		<!--<ui-gmap-polyline ng-repeat="p in linkPaths" path="p.path" stroke="p.stroke" visible='p.visible'
-            geodesic='p.geodesic' fit="false"></ui-gmap-polyline>-->
-    			<!-- <ui-gmap-layer type="Data" show="map.showData" onCreated="map.dataLayerCallback"></ui-gmap-layer> --> 
     			</ui-gmap-google-map>
 
     			<div id ="userQueries">
-    			<div ng-controller="queryCtrl">
+    			<div id="queryCtrl">
 	    			<div id ="nodeSelection"> 
 		    			<div id ="labelWrapperSource"> Source Nodes
 		    				<div style="padding:0 0 5px; font-size:small">select source nodes to show</div>
 		    				<div style="text-align: left">
-								<input type="checkbox" ng-model=$parent.selectedAllSrc 
+								<input type="checkbox" ng-model=selectedAllSrc 
 								ng-click="checkAll('selectedSrc', 'selectedAllSrc')">Select All:
 							</div>
 		    				<div id =divInCell>
-			    				<div id="testMarkers" ng-repeat="marker in $parent.allMarkers" style:"font-color:white">
+			    				<div id="testMarkers" ng-repeat="marker in allMarkers" style:"font-color:white">
 									<input type="checkbox" ng-model="marker.selectedSrc">{{marker.name}}
 								</div>
 							</div>
@@ -56,11 +51,11 @@
 						<div id ="labelWrapperDest"> Destination Nodes
 							<div style="padding:0 0 5px; font-size:small">select destination nodes to show</div>
 							<div style="text-align: left">
-								<input type="checkbox" ng-model=$parent.selectedAllDest 
+								<input type="checkbox" ng-model=selectedAllDest 
 								ng-click="checkAll('selectedDest', 'selectedAllDest')">Select All: 
 							</div>
 							<div id =divInCell>
-				    			<div id="testMarkers" ng-repeat="marker in $parent.allMarkers" style:"font-color:white">
+				    			<div id="testMarkers" ng-repeat="marker in allMarkers" style:"font-color:white">
 									<input type="checkbox" ng-model="marker.selectedDest">{{marker.name}}
 								</div>
 							</div>
@@ -76,7 +71,7 @@
 						</label>		
 					</div>
 					<div id=buttonHolder>
-						<button id=checkboxButton ng-click="$parent.mapQuery()" style:"display: block">
+						<button id=checkboxButton ng-click="mapQuery()" style:"display: block">
 						Go! -- Show the Nodes / Links selected </button>
 					</div>
 					<div id ="showLink" ng-model="clickedLinkHTML">(click on a link to see its information)
@@ -96,7 +91,7 @@
 		</section>
 		<div id="databaseCtrl" ng-controller ="databaseCtrl">
 			<button ng-click="insertNewTopology()">Reread Network Topology</button> 
-			<button ng-click="resetDatabases()">Test Reset Databases</button>
+			<button ng-click="resetDatabases()">Reset Databases</button>
 		</div> 
 		<!-- insert needed scripts here --> 
 		<script type="text/javascript" src="app/map.controller.js"></script> 
@@ -104,6 +99,5 @@
 		<script type="text/javascript" src="app/updateDatabase.controller.js"></script>
 		<script type="text/javascript" src="app/parseTopologies.service.js"></script>
 		<script type="text/javascript" src="app/createSubsetQuery.service.js"></script>
-		<script type="text/javascript" src="app/queryMap.controller.js"></script>
 	</body>
 </html>
