@@ -92,8 +92,11 @@ app.factory('parser', function($http, $filter) {
 
 	  var data = self.inventoryData; 
 	  var topoLinks = self.links; //WRONG, FIX
+	  console.log(topoLinks); 
+
 		// create alias
 	  var nodeInfo = data['nodes'];
+	  console.log(nodeInfo); 
 
 	  var Result = {links: []}; 
 
@@ -186,7 +189,7 @@ app.factory('parser', function($http, $filter) {
 	  }
 
 	  self.links = Result.links; 
-	  //console.log(Result.links); 
+	  console.log(Result.links); 
 
 	  //console.log("count of links: " + Result.links.length); 
 

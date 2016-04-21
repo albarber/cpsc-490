@@ -20,6 +20,10 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 					function(data) {
 						//console.log(data); 
 						$scope.inventoryData = data; 
+						console.log($scope.topoData); 
+						console.log($scope.inventoryData); 
+						console.log(JSON.stringify($scope.inventoryData, undefined, 2));
+						console.log(JSON.stringify($scope.topoData, undefined, 2));  
 
 						var parseFlow = new parser($scope.topoData, $scope.inventoryData); 
 
@@ -45,6 +49,8 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 						    });
 
 						}
+
+						console.log(parseFlow.links); 
 
 						//insert each link 
 					    for (var i = 0; i < parseFlow.links.length; i++) {

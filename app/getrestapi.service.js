@@ -29,7 +29,13 @@ app.factory('odlREST', function($http){
    			}         
 		};
 
+		/* TESTING GET FROM FILE 4/18 */
+		url = 'samples/tree-depth5-fanout2_topology.json';
+
+		console.log("url is " + url); 
+
 		$http.get(url, options).then(
+
 			//now that we've loaded, check to make sure we got data
 			function (res) {
 
@@ -61,6 +67,9 @@ app.factory('odlREST', function($http){
 	 			'Authorization': 'Basic YWRtaW46YWRtaW4=' //+ new Buffer('admin' + ':' + 'admin').toString('base64')
 				} 
 		}; 
+
+		url = 'samples/tree-depth5-fanout2_inventory.json'; 
+		//options = {}; 
 
 		$http.get(url, options).then(
 			function (res) {

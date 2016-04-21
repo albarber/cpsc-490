@@ -100,7 +100,7 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 
 	  //change these to reflect scale
 	  var minIntensity = 0;
-	  var maxIntensity = 0.03; //or 1, really? 
+	  var maxIntensity = 0.001; //or 1, really? 
 
 	  // fraction represents where the value sits between the min and max
 	  var fraction = (Math.min(feature.properties['intensity'], maxIntensity) - minIntensity) /
@@ -391,6 +391,7 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	$scope.reloadAll = function () {
 		console.log("reload clicked"); 
 
+		/*
 		$scope.loadMap(); 
 		$scope.loadMarkers();
 		$scope.allMarkers = $scope.nodeMarkers; 
@@ -400,6 +401,10 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 		$scope.selectedAllDest = true; 
 
 		console.log("getting here?"); 
+		*/
+
+		//$route.reload(); 
+		window.location.reload(); 
 
 	}; 
 
