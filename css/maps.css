@@ -61,11 +61,15 @@ div#Test{
    /* overflow-x: scroll; */ 
     /*position: relative;*/
 }
+#queryControl{
+    max-height: 100%; 
+    overflow: scroll;
+}
 
 #nodeSelection{
     display:inline-block; /* instead of table-row*/ 
     padding: 0px;
-    height: 200px;
+    height: 40%;/* 200px; */
     width: 100%;
     white-space: nowrap;
 }
@@ -104,7 +108,9 @@ div#Test{
 
 #divInCell{
     /*height: 50%;*/
-    height: 200px;
+    /* height: 200px;*/
+    min-height: 50px;
+    max-height: 200px; 
     width: 100%;
     overflow: scroll;
     outline-color: black;
@@ -131,13 +137,14 @@ div#Test{
 
 #showLink{
     font-family: Book Antiqua; 
-    font-size:medium;
+    font-size:small;
     font-weight: bold; 
     border-width: medium;
     border-color: white;
     border-style: solid;
     width: 85%;
-    height: 30%;
+    max-height: 100px;
+    overflow: scroll;
     margin: 0 auto;
     /*position: relative; */
     top: 5px; 
