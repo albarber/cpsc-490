@@ -1,4 +1,4 @@
-# cpsc-490
+# Ptolemy: An OpenDaylight Map
 
 ### Configuration
 This application has a 3-step configuration process. 
