@@ -1,6 +1,5 @@
 app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 
-	//CLEAN UP
 	$scope.userConfig = {
 		'ctrlHost': 'localhost', //ip here
 		'ctrlPort': 8181, //8181 by default
@@ -10,6 +9,7 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 
 	var odlrest = new odlREST($scope.userConfig); 
 
+	//inserts the topology (nodes and links) into the database
 	$scope.insertNewTopology = function () {
 		odlrest.loadTopology(
 			function(data) {
@@ -18,7 +18,7 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 
 				odlrest.loadNetworkInventory(
 					function(data) {
-						//console.log(data); 
+ 
 						$scope.inventoryData = data; 
 
 						var parseFlow = new parser($scope.topoData, $scope.inventoryData); 
@@ -29,14 +29,12 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 						for(var i = 0; i < parseFlow.nodes.length; i++) {
 
 						    var nodeData = {
-						      Node_id: parseFlow.nodes[i].id, //i, //nodes[i].id, <-- fix
+						      Node_id: parseFlow.nodes[i].id,
 						      Node_name: parseFlow.nodes[i].name,
 						      location_lat: parseFlow.nodes[i].latitude, 
 						      location_lng: parseFlow.nodes[i].longitude, 
 						      type: parseFlow.nodes[i].type 
 						    }; 
-
-						    console.log(nodeData); 
 
 						    $http.post('/nodes/insert', {nodeData: nodeData}).success(function(data){
 						    	console.log("success! " + data);
@@ -55,8 +53,6 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 						      dest_node: parseFlow.links[i].target, 
 						      intensity: parseFlow.links[i].intensity
 						    }; 
-
-						    console.log(linkData); 
 
 						    $http.post('/links/insert', {linkData: linkData}).success(function(data){
 						    	console.log("success! " + data);
@@ -79,7 +75,7 @@ app.controller('databaseCtrl', function($scope, $http, odlREST, parser) {
 		); 
 	}; 
 
-	//call before loading new topologies
+	//call a reset before loading new topologies
 	$scope.resetDatabases = function () {
 		$http.delete('/all').success(function(data){
 			console.log("cleared the databases"); 

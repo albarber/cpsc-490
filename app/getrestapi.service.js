@@ -13,11 +13,8 @@ app.factory('odlREST', function($http){
 		return 'http://' + this.userConfig.ctrlHost + ':' + this.userConfig.ctrlPort;
 	};
 
-	odlREST.prototype.loadTopology = function(successCbk, errorCbk) {
+	odlREST.prototype.loadTopology = function(successCbk, errorCbk) { 
 
-		console.log("starting topo load"); 
-
-		// body...
 		var self = this; 
 
 		var url = self.getbaseURL() + '/restconf/operational/network-topology:network-topology/'; 
@@ -29,18 +26,20 @@ app.factory('odlREST', function($http){
    			}         
 		};
 
+		/* SAMPLE FILE FOR DISPLAY WITHOUT NETWORK 
+		--> Comment out the line below line use data from connected ODL network */ 
+		url = 'samples/tree-depth5-fanout2_topology.json';
+
 		$http.get(url, options).then(
+
 			//now that we've loaded, check to make sure we got data
 			function (res) {
 
 				if (res.statusText == 'OK') {
-					res = res.data; 
-					//console.log("got data ok"); 
+					res = res.data;  
 					successCbk(res); 
 				}
 				else{
-					//console.log("not ok?")
-					//console.log(res); 
 					errorCbk("failure to get topo data"); 
 				}
 			},
@@ -62,6 +61,10 @@ app.factory('odlREST', function($http){
 				} 
 		}; 
 
+		/* SAMPLE FILE FOR DISPLAY WITHOUT NETWORK 
+		--> Comment out the line below line use data from connected ODL network */ 
+		url = 'samples/tree-depth5-fanout2_inventory.json'; 
+
 		$http.get(url, options).then(
 			function (res) {
 				if (res.statusText == 'OK') {
@@ -69,7 +72,6 @@ app.factory('odlREST', function($http){
 					successCbk(res); 
 				}
 				else{
-					//console.log(res); 
 					errorCbk("failure to get node inventory data"); 
 				}
 			},

@@ -1,6 +1,4 @@
-//this controller: 
-// 1) gets the data from database (based on query?)
-// 2) puts it on the map
+//this is the main controller for the map
 
 //uses angular-google-maps in order to allow functionality like data layers
 var app = angular.module('prototypeApp', ['uiGmapgoogle-maps']);
@@ -14,32 +12,13 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	//polylines for links
 	$scope.linkPaths = []; 
 
-	//at what zoom level do you want to show the links? (default 7)
+	//set at what zoom level to show the links? (default 5)
 	$scope.linkConfig = {
 		zoomShow: 5
 	}
 
-	function MockDataLayer(dataLayer) {
-
-		//possibly move this somewhere else? -- do it? 
-		$http.post('/links/update', {}, function(data){
-			console.log("updated table?");
-		}); 
-
-		// samples/badTree.json also works
-  		$http.get('/links').success(function(data) {
-  			console.log("here"); 
-    		dataLayer.addGeoJson(data); 
-    		dataLayer.setStyle(styleFeature);
-
-    		console.log(dataLayer);
-  		});
-	}
-
 	//set the map controls (zoom, center) here
 	$scope.loadMap = function () {
-
-		console.log("resetting the map?"); 
 
 		$scope.map = {
 	      zoom: 5,
@@ -52,23 +31,19 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
   		};
 	};
 
+	//changes the link visibility 
 	$scope.$watch('map.zoom', function(newVal, oldVal){
-		if(oldVal != newVal){ //want to check that we've moved from show->no show or vice versa (otherwise do nothing)
-       		//alert("Zoom Changed from: " + $scope.map.zoom);
-       		console.log("zoom changed to: " + $scope.map.zoom)
-       		console.log($scope.linkPaths); 
+		if(oldVal != newVal){ //want to check that we've moved from show->no-show or vice versa (otherwise do nothing)
 
+			//if we've moved from no-show->show
        		if (newVal >= $scope.linkConfig.zoomShow && oldVal < $scope.linkConfig.zoomShow) {
-       			//$scope.linkPaths.setMap($scope.map); 
-       			console.log("changing visibility");
 
        			for (var a = 0; a < $scope.linkPaths.length; a++) {
        				$scope.linkPaths[a].visible = true; 
        			}
        			
-       		}
+       		} //if we've moved from show->no-show
        		else if (newVal < $scope.linkConfig.zoomShow && oldVal >= $scope.linkConfig.zoomShow) {
-       			console.log("now rehide the visibility"); 
 
        			for (var b = 0; b < $scope.linkPaths.length; b++) {
        				if($scope.linkPaths[b]) 
@@ -93,14 +68,14 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	  return 'hsl(' + color[0] + ',' + color[1] + '%,' + color[2] + '%)';
 	}
 
-
+	//style feature sets the correct appearance of all links
 	function styleFeature(feature) {
 	  var low = [151, 83, 34];   // color of low intensity (green) 
 	  var high = [5, 69, 54];  // color of high intensity (red)
 
-	  //change these to reflect scale
+	  //user should change these to reflect scale
 	  var minIntensity = 0;
-	  var maxIntensity = 0.03; //or 1, really? 
+	  var maxIntensity = 0.001; //or 1, really? 
 
 	  // fraction represents where the value sits between the min and max
 	  var fraction = (Math.min(feature.properties['intensity'], maxIntensity) - minIntensity) /
@@ -109,15 +84,13 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	  var color = interpolateHsl(low, high, fraction);
 
 	  alternate = !alternate; 
-	  //console.log(alternate); 
 
 	  return {
 	    strokeWeight: 4,
 	    strokeColor: color,
 	    geodesic: alternate, //to show parallel links, make one link geodesic (slight curve), other straight
 	    strokeOpacity: 0.7,
-	    zIndex: Math.floor(feature.properties['intensity']) // and we put links with higher intensity on top
-	    //zIndex changed from feature.getProperty('intensity')
+	    //zIndex: Math.floor(feature.properties['intensity']) // and we put links with higher intensity on top
 	  }; 
 	}
 
@@ -129,7 +102,6 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 		$scope.linkPaths = []; // reset
 
 		//update the link table if need be
-		//possibly move this somewhere else? -- do it? 
 		$http.post('/links/update', {}, function(data){
 			console.log("updated table?");
 		}); 
@@ -138,16 +110,11 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 			queryString = 'SELECT * FROM Links'; 
 		}
 		// get all of the links from the link table in geoJSON format
-		// samples/badTree.json also works
-  		//$http.get('/links').success(function(data) {
   		$http({
   			method: 'POST',
   			url: '/links',
   			data: {LinkQuery: queryString}
   		}).success(function (data) {
-
-    		console.log("data from table is: ");
-    		console.log(data); 
 
     		var links = data.features;
 
@@ -157,7 +124,6 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 
     			var linePath = links[i]; //?
 
-    			//console.log(links[i]); 
     			$scope.polylineRef[i] = links[i]; 
 
     			var lineStyle = styleFeature(links[i]); 
@@ -172,10 +138,7 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
     				}, 
     				geodesic: lineStyle.geodesic,
     				clickable: true,
-    				//model: $scope.linkPaths,
-    				visible: true//, //set false if not want to show at outset
-    				//title: "TESTING",
-    				//show: false
+    				visible: true//, //set false if not want to show link at outset
     			}
 
 
@@ -183,33 +146,18 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 
     				
     				click: function(line, eventName, model, args) {
-    					//console.log("line clicked: ");
-    					//console.log(line); 
-    					//line.strokeOpacity = 1; 
 
     					//must do $parent.p.id to get reference b/c of using ng-repeat instead of polylines model
     					var temp = $scope.polylineRef[model.$parent.p.id]['properties']
 
-    					/*
-    					$scope.clickedLinkHTML = "<b> Link ID: " + temp.Link_id + "</b> \
-    					 <br/> Source Node: " + temp.source_node + "<br/> \
-    					 Destination Node: " + temp.dest_node + "<br/> \
-    					 intensity: " + temp.intensity; */
-
-
-    					//model.show = !model.show; 
-    					//$scope.clickedLink = line; 
-    					//console.log("id is: " + line.id)
-    					//alert("clickeddddd"); 
+    					//set variable so can have div w/ $scope.clickedLinkHTML in it
     					$scope.clickedLinkHTML = temp; 
-    					console.log($scope.clickedLinkHTML);  //so can have div w/ $scope.clickedLinkHTML in it
     				}
     			}; 
 
     			$scope.linkPaths.push(currPolyline); 
     		}
 
-    		console.log($scope.linkPaths); 
   		});
 
 	}; 
@@ -225,7 +173,7 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
         	idKey = "id";
       	}	
       
-      	//point can be geoJSON <-- instead of "latitude" and "longitude"
+      	//point can be geoJSON instead of "latitude" and "longitude"
       	var ret = {
       		latitude: lat,
       		longitude: lng, 
@@ -233,8 +181,8 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
       		show: false,
       		name: name,
       		type: type,
-      		selectedSrc: true,
-      		selectedDest: true
+      		selectedSrc: true, //for checkbox queries, start as true
+      		selectedDest: true //for checkbox, start as true
       	}; 
 
       	ret[idKey] = i; 
@@ -248,11 +196,7 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
         model.show = !model.show;
     };
 
-	//THIS WORKS
 	$scope.loadMarkers = function (queryString) {
-
-		console.log("getting new markers? "); 
-		console.log("queryString is: " + queryString);
 
 		if (!queryString) {
 			queryString = 'SELECT * FROM Nodes'; 
@@ -276,32 +220,26 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 					parseFloat(nodes[i].geometry.coordinates[0])); 
 				var lat = parseFloat(nodes[i].geometry.coordinates[1]); 
 				var lng = parseFloat(nodes[i].geometry.coordinates[0]); 
-				var html = "<b> Node: " + name + "</b> <br/>" + point + "<br/>" + type;
-
-				//console.log("html is: " + html); 
-				//console.log("point is: " + point); 
+				var html = "<b> Node: " + name + "</b> <br/>" + point + "<br/>" + type; 
 
 				var ret = createMarker(i, html, lat, lng, name, type)
 
 				$scope.nodeMarkers.push(ret); 
-				console.log("pushed node marker"); 
 			}
-
-			//console.log($scope.nodeMarkers[0]); 
-			console.log($scope.nodeMarkers); 
-
 		}).error(function(data, status){
 			console.log("error getting the nodes"); 
 		}); 
 
-		//var markerCluster = new MarkerClusterer(map, nodeMarkers);
-
 	};
 
-	$scope.checkAll = function(key, model) {
+	/*---------------------- 
+	/
+	/ Custom Queries Section 
+	/
+	-----------------------*/
 
-		console.log(key); 
-		console.log(model);
+	//for the checkboxes in the query section, select all
+	$scope.checkAll = function(key, model) {
 
 		if ($scope[model]) {
             $scope[model] = true;
@@ -309,17 +247,9 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
             $scope[model] = false;
         }
         angular.forEach($scope.allMarkers, function (item) {
-        	//console.log(item[key]); 
-        	//console.log(item)
             item[key] = $scope[model];
         });
     };
-
-	/*---------------------- 
-	/
-	/ Custom Queries Section 
-	/
-	-----------------------*/
 
 	$scope.userNodeQuery = {
 		table: "Nodes",
@@ -330,30 +260,22 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 		string: ""
 	}; 
 
-	//$scope.selectedSrc = {}
 	$scope.mapQuery = function() {
 		
-
-		//for queries, firs check if all selected; then add to dest / source lists if not
+		//for queries, first check if all selected; then add to dest / source lists if not
 
 		//DESTINATIONS
 		var selectedDestinations = $scope.allMarkers.filter(function(node){
 			return node.selectedDest; 
 		}); 
 
-		console.log(selectedDestinations); 
-
 		destList = []; 
-
 		angular.forEach(selectedDestinations, function(obj){
-
 			destList.push(obj.name); 
-
 		}); 
-		console.log(destList); 
 
 
-		//NOW SOURCES
+		//SOURCES
 		var selectedSources = $scope.allMarkers.filter(function(node){
 			return node.selectedSrc; 
 		}); 
@@ -365,7 +287,6 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 		var userQueries = [];
 		userQueries.push($scope.userNodeQuery);
 		userQueries.push($scope.userLinkQuery); 
-		//console.log(userQueries);
 
 		//BUILD THE QUERY
 		var queries = new subsetQuery({
@@ -374,9 +295,8 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 							additionalQuery: userQueries}); 
 
 		var queryStrings = queries.createQuery(); 
-		//console.log(queryStrings); 
 
-		//console.log(queryStrings.NodeQuery); 
+		//reload markers and polylines based on queries
 		$scope.loadMarkers(queryStrings.NodeQuery); 
 		$scope.loadPolylines(queryStrings.LinkQuery); 
 	}; 
@@ -387,20 +307,9 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	/
 	----------------------------*/
 
-	
+	//reload / reset the map
 	$scope.reloadAll = function () {
-		console.log("reload clicked"); 
-
-		$scope.loadMap(); 
-		$scope.loadMarkers();
-		$scope.allMarkers = $scope.nodeMarkers; 
-		$scope.loadPolylines(); 
-
-		$scope.selectedAllSrc = true; 
-		$scope.selectedAllDest = true; 
-
-		console.log("getting here?"); 
-
+		window.location.reload(); 
 	}; 
 
 	//On initial load: 
@@ -411,7 +320,5 @@ app.controller('MapCtrl', function($scope, $http, odlREST, uiGmapIsReady, subset
 	$scope.loadMarkers(); 
 	$scope.allMarkers = $scope.nodeMarkers; //on init, keep track of all nodes (gotten from database)
 	$scope.loadPolylines(); 
-
-	//console.log($scope.linkPaths); 
 
 }); 

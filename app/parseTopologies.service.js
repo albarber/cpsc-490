@@ -7,25 +7,20 @@ app.factory('parser', function($http, $filter) {
 		this.inventoryData = inventoryData; 
 	}
 
-	//This is to make up some locations while fixing the geolocation aspect given IP addresses
+	//This function gets a random number within a range
 	parser.prototype.getRandomInRange = function(from, to, fixed) {
 		return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
 		// .toFixed() returns string, so ' * 1' is a trick to convert to number
 	};
 
+	//parseTopology() parses the JSON returned from the REST API call to network-topology
 	parser.prototype.parseTopology = function() {
-
-	  console.log("in the parse Topo part"); 
 
 	  var self = this; 
 
-	  var data = self.topoData; 
-
-	  console.log("getting self things")
-	  console.log(self.topoData);
-	  console.log(self.inventoryData);  
+	  var data = self.topoData;   
 	  
-		// create alias
+	  // create alias
 	  var topology = data['network-topology'].topology[0];
 
 	  // prepare stub for results
@@ -52,12 +47,11 @@ app.factory('parser', function($http, $filter) {
 	      node.id = topology.node[i]['host-tracker-service:addresses'][0]['id']; 
 	      node.ip_address = topology.node[i]['host-tracker-service:addresses'][0]['ip']; 
 	    } else {
-	      node.id = i; //assign next number in list to switch
+	      node.id = i; //assign next number in list to every switch
 	    }
 
 	    //HARD CODE -- lat is -90 to +90, lng is -180 to +180
-	    // right now: focused on continental United States 
-	    // (mostly - though occasionally nodes end up in the ocean)
+	    // right now: range is only on continental United States (mostly - though occasionally nodes end up in the ocean)
 	    node.longitude = self.getRandomInRange(-120, -75, 3);
 	    node.latitude = self.getRandomInRange(27, 44, 3); 
 
@@ -75,10 +69,8 @@ app.factory('parser', function($http, $filter) {
 	    // add the link to the result object
 	    topologyResult.links.push(link);
 	  }
-	  console.log("number of nodes is: " + topologyResult.nodes.length);
-	  console.log("number links: " + topologyResult.links.length); 
-
-	  console.log(topologyResult); 
+	  //console.log("number of nodes is: " + topologyResult.nodes.length);
+	  //console.log("number links: " + topologyResult.links.length); 
 
 	  self.nodes = topologyResult.nodes; 
 	  self.links = topologyResult.links; 
@@ -86,18 +78,20 @@ app.factory('parser', function($http, $filter) {
 	  return topologyResult;
 	}; 
 
+	//parseNodeInventory() parses JSON returned by the REST API call to node-inventory
 	parser.prototype.parseNodeInventory = function() {
 
 	  var self = this; 
 
 	  var data = self.inventoryData; 
-	  var topoLinks = self.links; //WRONG, FIX
+	  var topoLinks = self.links;
+
 		// create alias
 	  var nodeInfo = data['nodes'];
 
 	  var Result = {links: []}; 
 
-	  var linkID = 0; //MUST FIX THIS WHEN HAVE MULTIPLE FLOWS
+	  var linkID = 0; //number links sequentially
 
 	  // process nodes
 	  for (var i = 0; i < nodeInfo.node.length; i++) {
@@ -105,16 +99,16 @@ app.factory('parser', function($http, $filter) {
 	    var currentNode = nodeInfo.node[i]; 
 
 	    //for each node connector get the information to update the database
+	    //the YANG data model shows just one node connector for two-way links, so must create two links for each
 	    for (var j = 0; j < currentNode['node-connector'].length; j++) {
 
-	      var linkOne = {}; //this is from the current node to the dest
-	      var linkTwo = {}; // this is from the dest to the current
+	      var linkOne = {}; //this is from the current node to the destination
+	      var linkTwo = {}; // this is from the destination to the current
 
 	      linkOne.id = linkID; 
 	      linkTwo.id = linkID + 1; 
 	      linkID = linkID + 2; 
 
-	      //IS THIS HOW TO IDENTIFY THEM??
 	      linkOne.source = currentNode.id; 
 	      linkTwo.target = currentNode.id; 
 
@@ -131,29 +125,20 @@ app.factory('parser', function($http, $filter) {
 	        } 
 
 	        //or switch to another switch (don't ignore)
-	        else {
+	        else { //if necessary, can use this logic to also parse host-switch connections
 
 	          //get the node connector id. find the link in the results from topoResults. get the connection
 	          var connectorId = currentNode['node-connector'][j].id 
 
-	          //console.log(connectorId); 
-
-	          //console.log("topoLinks is " + JSON.stringify(topoLinks)); 
 	          var arrayFound = $filter('filter')(topoLinks, {given_id: connectorId}); 
-
-	          console.log("arrayFound is " + arrayFound); 
 
 	          if (arrayFound.length > 0) {
 	          	linkOne.target = arrayFound[0].target;
 	          	linkTwo.source = linkOne.target; 
 	          }; 
 
-	          //console.log(arrayFound); 
-
 	        }
 	      }
-
-	      console.log(currentNode['node-connector'][j]); 
 
 	      var currentSpeed = currentNode['node-connector'][j]['flow-node-inventory:current-speed']; //this is the link capacity
 	      if (!currentSpeed) {
@@ -174,9 +159,6 @@ app.factory('parser', function($http, $filter) {
 		  var intensityOne = (bitsOne / duration) / currentSpeed; 
 		  var intensityTwo = (bitsTwo / duration) / currentSpeed; 
 
-		  //console.log(intensityOne); 
-		  //console.log(intensityTwo); 
-
 	      linkOne.intensity = intensityOne; 
 	      linkTwo.intensity = intensityTwo; 
 
@@ -186,9 +168,6 @@ app.factory('parser', function($http, $filter) {
 	  }
 
 	  self.links = Result.links; 
-	  //console.log(Result.links); 
-
-	  //console.log("count of links: " + Result.links.length); 
 
 	  return Result;
 

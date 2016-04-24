@@ -5,9 +5,12 @@ app.factory('subsetQuery', function($filter) {
 		this.parameters = parameters; 
 	}
 
+	//default queries select all values in the table
 	var baseQueryLinks = "SELECT * FROM Links";
 	var baseQueryNodes = "SELECT * FROM Nodes";
 
+
+	//names of columns in each table that can be queried
 	var linkCategories = [
 		"Link_id", 
 		"source_node", 
@@ -25,18 +28,8 @@ app.factory('subsetQuery', function($filter) {
 		"location_lng",
 		"type"
 	];
-	
-	/*
-	var validComparators = [
-		">",
-		"<",
-		">=",
-		"<=",
-		"!=",
-		"="
-	]
-	*/
 
+	//createQuery() takes in user input and returns a string to query MySQL
 	subsetQuery.prototype.createQuery = function(){
 
 		var queries = {}; //will return a node query and a link query
@@ -46,30 +39,22 @@ app.factory('subsetQuery', function($filter) {
 
 		var additionalString = ""; 
 
-		console.log("creating the query"); 
-
 		var self = this; 
-
-		console.log(self.parameters); 
 
 		//before the first query, add "WHERE"
 		//after the first query, need to add "AND" or "OR" at beginning of every new clause
 		var firstNodeQuery = true; 
 		var firstLinkQuery = true; 
 
-		//FOR NODES: And before Or -- so must do WHERE Nodes.type = X AND (Nodes.node_name IN Y OR ... IN Z)
-
 
 		/*
-		to parse the additional query need X things: 
+		to parse the additional query need 3 things: 
 			1. whether we are querying the "Nodes" or "Links" table
 			2. What we are querying in that table (links.intensity? Nodes.type?)
 			3. The condition
 		*/
 
-		//FIRST, WHERE statement for the additional query
 		if (self.parameters.hasOwnProperty('additionalQuery')){
-			//var additionalString = "WHERE "; //will add on to this
 
 			var userInput = self.parameters.additionalQuery; 
 
@@ -82,7 +67,6 @@ app.factory('subsetQuery', function($filter) {
 						additionalString = additionalString + " AND ";
 					else {
 						additionalString = additionalString + " WHERE ";
-						//firstNodeQuery = false; 
 					}
 
 					//assume separated by spaces
@@ -113,14 +97,12 @@ app.factory('subsetQuery', function($filter) {
 						additionalString = additionalString + " AND ";
 					else {
 						additionalString = additionalString + " WHERE ";
-						//firstLinkQuery = false; 
 					}
 
 					//assume separated by spaces
 					var strArray = userInput[j].string.split(" "); 
-					console.log(strArray);
 
-					if (strArray.length == 3) { //only proceed if this
+					if (strArray.length == 3) { //only proceed if 3 space delimited strings
 						
 						//need 'feature' 'comparator' 'value'
 						if (linkCategories.indexOf(strArray[0]) !== -1) {
@@ -141,24 +123,16 @@ app.factory('subsetQuery', function($filter) {
 
 		}
 
-
-
-
-
-		//do something else if all nodes selected?? for performance?? YES???? 
-
-		//if there are a list of source nodes -- actually, assume for now that sourceNodes means destNodes passed in
+		//assume for now that sourceNodes also means destNodes passed in
 		if (self.parameters.hasOwnProperty('sourceNodes')) {
 
-			//need to get the obj in the form of ("val", "val2") instead of ["val", "val2"]
+			//need to get the object in the form of ("val", "val2") instead of ["val", "val2"] for MySQL
 			sourceString = "("; 
 			for (var i = 0; i < self.parameters.sourceNodes.length; i++){
 				sourceString = sourceString + "'" + self.parameters.sourceNodes[i] + "', "; 
 			}
 
 			sourceString = sourceString + "'')" //empty string to make it a passable query
-
-			//console.log(sourceString); 
 
 			if (firstLinkQuery == false) {
 				linkQuery = linkQuery + " AND ";
@@ -176,7 +150,7 @@ app.factory('subsetQuery', function($filter) {
 			nodeQuery = nodeQuery + "( Nodes.Node_name IN " + sourceString + " OR "; 
 		}
 
-		//if there are a list of dest nodes passed in
+		//if there are a list of dest nodes passed in, also include a clause for that
 		if (self.parameters.hasOwnProperty('destNodes')) {
 
 			destString = "("
@@ -186,15 +160,11 @@ app.factory('subsetQuery', function($filter) {
 
 			destString = destString + "'')" //empty string to make it a passable query
 
-			//console.log(destString); 
-
 			linkQuery = linkQuery + "Links.dest_node IN " + destString; 
 
 			nodeQuery = nodeQuery + "Nodes.Node_name IN " + destString + ")"; 
 
 		} 
-
-		console.log("LINK QUERY IS: "+ linkQuery); 
 
 		queries.NodeQuery = nodeQuery; 
 		queries.LinkQuery = linkQuery; 

@@ -1,5 +1,3 @@
-
-//based off of Bierman app
 var express  = require('express');
 var app      = express();
 
@@ -22,7 +20,7 @@ var userConfig = {
 	'proxyPort': 5555, // proxy's port
 	'webServerPort': 8080, // Web server's port
 
-	//database info settings -- MySQL for now
+	//database info settings -- MySQL
 	'dbUsername': 'alb',
 	'dbPassword': 'password',
 	'database': '490maps'
@@ -40,7 +38,6 @@ app.use(methodOverride());
 /*
 * Configure MySQL parameters.
 */
-//FIX THESE BASED ON USER CONFIG
 var con = mysql.createConnection({
 	host : "localhost", //change if needed
 	user : userConfig.dbUsername,
@@ -69,8 +66,7 @@ con.connect(function(error){
     // 1. get the nodes from the node table in geojson format
     app.post('/nodes', function(req, res) {
 
-    	//console.log("in the get part"); 
-    	console.log(req.body); 
+    	//console.log(req.body); 
 
     	var customQuery = req.body.NodeQuery; 
 
@@ -78,13 +74,10 @@ con.connect(function(error){
     		customQuery = 'SELECT * FROM Nodes'; 
     	}
 
-    	//console.log("custom query is: " + customQuery); 
-
     	con.query(customQuery, function(err, rows) {
     		if (err) {
     			console.log(err);
-    		} else { //ok so we got all of the nodes, now want to output into geojson
-    			//console.log(rows); 
+    		} else { //got all of the nodes, now want to output into geojson 
 
     			var geojson = {
     				type: 'FeatureCollection',
@@ -92,8 +85,6 @@ con.connect(function(error){
     			}; 
 
     			for (var i = 0; i < rows.length; i++) {
-
-    				//console.log(rows[i]); 
 
     				var nodePoint = {
     					type: 'Feature',
@@ -111,26 +102,22 @@ con.connect(function(error){
 
     			}
 
-    			//console.log("geoJSON is: " + JSON.stringify(geojson)); 
-
     			res.send(geojson); 
     		}
     	}); 
-
-    	//con.end(); //FIX?
 
     }); 
 
     // 2. get links from the link table in geojson format
     app.post('/links', function(req, res) {
 
-    	var customQuery = req.body.LinkQuery;  //change this to handle errors? 
+    	var customQuery = req.body.LinkQuery; 
 
     	if (!customQuery) {
     		customQuery = 'SELECT * FROM Links'; 
     	}
 
-    	console.log("custom query is: " + customQuery); 
+    	//console.log("custom query is: " + customQuery); 
 
     	con.query(customQuery, function(err, rows) {
     		if (err) {
@@ -247,11 +234,23 @@ con.connect(function(error){
     // 6. delete? both nodes and links for now
     app.delete('/all', function(req, res) {
 
-    	con.query("DELETE from Links"); // add error catching
+    	con.query("DELETE from Links", function(err, result){
+            if(err){
+                console.log(err); 
+            } else{
 
-    	con.query("DELETE from Nodes"); //add error catching
+            }
+        });
 
-    	res.send("deletion done"); 
+    	con.query("DELETE from Nodes", function(err, result){
+            if(err){
+                console.log(err);
+            } else{
+
+            }
+        });
+
+    	res.send("deletion finished"); 
 
     }); 
 
