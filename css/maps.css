@@ -57,6 +57,7 @@ div#Test{
     /*margin: 5px;*/
     float: right;
     width: 34%; 
+    overflow-y: scroll;
    /* overflow-x: scroll; */ 
     /*position: relative;*/
 }
@@ -136,6 +137,8 @@ div#Test{
     border-color: white;
     border-style: solid;
     width: 85%;
+    height: 30%;
+    margin: 0 auto;
     /*position: relative; */
     top: 5px; 
     bottom: 15px;
@@ -146,13 +149,22 @@ div#Test{
 
 #buttonHolder{
     text-align: center;
-    padding: 10px 0px 5px 0px;
+    padding: 0px 0px 5px 0px;
+    margin: 0 auto;
+}
 
+#buttonHolder2{
+    /*text-align:center; */ 
+    width: 100%;
+    display: inline-block;
+    float: left;
+    height: 4%;
+    background-color:aqua;
 }
 
 #databaseCtrl{
     background-color:aqua;
-    height: 4%; 
+    float: left;
 }
 
 
