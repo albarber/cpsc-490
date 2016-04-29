@@ -56,8 +56,9 @@ _Note_: the 4 latitude and longitude columns will be set only after topology inf
 
 ### Running GUI
 1. Have Node.js installed on your computer
-2. In terminal, navigate to the root folder of the project and run `node server.js` 
-3. Use a browser to go to http://{{ip-for-GUI}}:{{port-for-GUI}}. By default this link is http://localhost:8080
+2. Ensure that OpenDaylight is running (or that you are using a sample data file)
+3. In terminal, navigate to the root folder of the project and run `node server.js` 
+4. Use a browser to go to http://{{ip-for-GUI}}:{{port-for-GUI}}. By default this link is http://localhost:8080
 
 On first use, or if the database is not populated, hit the "Reread network topology" button, then reload the map (either by refreshing the window, or hitting the "Reload Map from Data" button). If the database is already populated but you wish to load in new network data, hit the "Reset Databases" button before rereading the network topology and reloading the map. 
 
@@ -75,4 +76,14 @@ In app/map.controller.js, the user can set an optional icon for node markers in 
 In app/map.controller.js, in the function styleFeature() the user can customize link appearance in two ways.
 + setting `minIntensity` and `maxIntensity`, which will set the values for low (green) traffic and high (red) traffic
 + setting `strokeWeight` and `strokeIntensity` to create wider/thinner or more/less opaque links
+
+#### The Network Data
+If OpenDaylight is running, the application will be able to access the data from the YANG UI models. If not, there are several sample data files included in the 'samples' folder. In getrestapi.service.js, make sure that `loadTopology()` uses the corresponding topology sample file, and `loadNetworkInventory()` uses its partner node inventory file.
+
+The samples folder currently includes topology and node inventory files for: 
++ A simple network with one switch and five hosts (simple-5)
++ A linear network with seven switches and seven hosts (linear-7)
++ A more complex tree network, of depth 5 and a fanout of 2 (tree-depth5-fanout2)
+
+By default, the application is set to use the tree sample file -- so any user can test easily.
 
